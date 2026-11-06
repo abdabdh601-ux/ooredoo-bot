@@ -1,0 +1,32 @@
+import re
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
+
+# دالة للتعامل مع الرسائل النصية (مثل أرقام الهواتف)
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_text = update.message.text.strip()
+    
+    # التحقق من أن النص هو رقم هاتف Ooredoo (يبدأ بـ 05 و يتكون من 10 أرقام)
+    if re.match(r'^05\d{8}$', user_text):
+        # هنا يتم وضع كود الاتصال بشركة الاتصالات أو عملية التفعيل لاحقاً
+        await update.message.reply_text(
+            f"✅ تم استلام الرقم: {user_text}\n"
+            f"⏳ جاري فحص وتفعيل هدية 2Go مجاناً..."
+        )
+    else:
+        await update.message.reply_text(
+            "❌ الرقم غير صحيح!\n"
+            "يرجى إرسال رقم هاتف Ooredoo صحيح يبدأ بـ 05 ويتكون من 10 أرقام."
+        )
+
+if __name__ == '__main__':
+    # ضع هنا توكن البوت الخاص بك الذي أخذته من BotFather بين علامتي التنصيص
+    TOKEN = "PUT_YOUR_BOT_TOKEN_HERE"
+    
+    app = ApplicationBuilder().token(TOKEN).build()
+    
+    # ربط البوت باستقبال أي نص يرسله المستخدم
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+    
+    print("🤖 البوت يعمل الآن وينتظر الرسائل...")
+    app.run_polling()
